@@ -19,6 +19,20 @@ const ToDoGen = () => {
 		setValue(event.target.value)
 	}
 
+	const taskCounter = () => {
+		let mult = "s"
+		let numberOfTasks = "No"
+		let congrats = "- hooray!"
+
+		if (itemList.length == 1) {numberOfTasks = 1; mult = ""; congrats = ""}
+		if (itemList.length > 1) {numberOfTasks = itemList.length; mult = "s"; congrats = ""}
+
+		return <li className="list-group-item d-flex w-100 align-middle justify-content-between">
+			<small>{numberOfTasks} task{mult} left {congrats}</small>
+		</li>
+	}
+
+
 	return (
 		<div className="row justify-content-center">
 			<div className="col-4">
@@ -39,9 +53,10 @@ const ToDoGen = () => {
 				/>
 				{itemList.map(entry => 
 					<li key={entry.id} className="list-group-item d-flex w-100 align-middle justify-content-between">
-					{entry.listItem}
+					<b>{entry.listItem}</b>
 					<span type="button" style={{color: "red"}} onClick={() => {removeEntry(entry.id)}}>done</span>
 					</li>)}
+				{taskCounter()}
 			</ul>
 			</div>
 		</div>

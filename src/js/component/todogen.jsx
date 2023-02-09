@@ -25,7 +25,7 @@ const ToDoGen = () => {
 				{listOfEntries.map(entry => 
 					<li key={entry.id} className="list-group-item d-flex w-100 justify-content-between">
 					{entry.entry}
-					<span type="button">X</span>
+					<span type="button" onClick={() => {/*do stuff here*/}}>X</span>
 					</li>)}
 			</ul>
 			</div>

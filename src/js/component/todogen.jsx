@@ -1,36 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { render } from "react-dom/cjs/react-dom.production.min";
 
-let itemList = []
+let key = 0
 
 const ToDoGen = () => {
 
-	const [text, inputText] = useState("")
-	const [key, newKey] = useState(0)
-
-
-	const inputVal = (event) => {
-		if (event.key === "Enter") {
-			let newEntry = <li key={key} className="list-group-item d-flex w-100 justify-content-between">
-				{event.target.value}
-				<span type="button">X</span>
-				</li>	
-			if (event.target.value != "") {
-				console.log(key)
-				itemList.push(newEntry)
-				inputText(event.target.value)
-				newKey(key+1)
-		}
-		}
-	}
-
-	const listGen = () => {
-		let newItem = []
-		if (itemList.length == 0) return null
-		else {
-			for (let i=0; i<= itemList.length-1; i++) {newItem.push(itemList[i])}
-		}
-		return newItem
-	}
+	const [listOfEntries, setItemList] = useState([])
 
 	return (
 		<div className="row justify-content-center">
@@ -40,10 +15,18 @@ const ToDoGen = () => {
 				<input 
 					type="text" 
 					className="list-group-item input-group" 
-					placeholder="What do you need to do today?"
-					onKeyUp={(event) => {inputVal(event)}}
+					placeholder="What else do you need to do today?"
+					onKeyUp={(event) => {
+						if (event.key === "Enter" && event.target.value !== "") {
+							setItemList([...listOfEntries, { id: key++, entry: event.target.value }])
+						}
+					}}
 				/>
-				{listGen()}
+				{listOfEntries.map(entry => 
+					<li key={entry.id} className="list-group-item d-flex w-100 justify-content-between">
+					{entry.entry}
+					<span type="button">X</span>
+					</li>)}
 			</ul>
 			</div>
 		</div>

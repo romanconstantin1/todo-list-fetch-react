@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { render } from "react-dom/cjs/react-dom.production.min";
 
 let key = 0
-const style = 'input-focus-border-color: "black"'
 
 const ToDoGen = () => {
 
 	const [itemList, setItemList] = useState([])
 	const [value, setValue] = useState('')
+	const [vis, setVis] = useState(false)
 
 	const removeEntry = (entryId) => {
 		let newList = itemList.map(a => ({...a}))
@@ -52,9 +52,13 @@ const ToDoGen = () => {
 					}}
 				/>
 				{itemList.map(entry => 
-					<li key={entry.id} className="list-group-item d-flex w-100 align-middle justify-content-between">
+					<li key={entry.id} 
+					className="list-group-item d-flex w-100 align-middle justify-content-between"
+					onMouseEnter={() => setVis(true)}
+					onMouseLeave={() => setVis(false)}>
 					<b>{entry.listItem}</b>
-					<span type="button" style={{color: "red"}} onClick={() => {removeEntry(entry.id)}}>done</span>
+					{vis && ( //add logic here for individually visible delete buttons
+					<span type="button" style={{color: "red"}} onClick={() => {removeEntry(entry.id)}}>delete</span>)}
 					</li>)}
 				{taskCounter()}
 			</ul>

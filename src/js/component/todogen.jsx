@@ -28,7 +28,7 @@ const ToDoGen = () => {
 		if (itemList.length == 1) {tasksLeft = 1; mult = ""; yay = ""}
 		if (itemList.length > 1) {tasksLeft = itemList.length; mult = "s"; yay = ""}
 
-		return <li className="list-group-item d-flex w-100 align-middle justify-content-between">
+		return <li className="list-group-item w-100">
 			<small>{tasksLeft} task{mult} left {yay}</small>
 		</li>
 	}
@@ -37,7 +37,7 @@ const ToDoGen = () => {
 		<div className="row justify-content-center">
 			<div className="col-4">
 			<h1 className="mt-5 text-center">minimalist to-do list</h1>
-			<ul className="shadow list-group mt-3">
+			<ul className="shadow d-flex list-group mt-3">
 				<input 
 					type="text"
 					value={value} 
@@ -62,6 +62,13 @@ const ToDoGen = () => {
 					<span type="button" style={{color: "red"}} onClick={() => {removeItem(entry.id)}}>delete</span>)}
 					</li>)}
 				{taskCounter()}
+				<li className="list-group-item w-100 text-center">
+					<b type="button" style={{color: "red"}}
+					onClick={() => {
+						if (confirm("delete all tasks - are you sure?")) {setItemList([])}
+					}}>
+						delete all tasks</b>
+				</li>
 			</ul>
 			</div>
 		</div>

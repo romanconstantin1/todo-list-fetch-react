@@ -9,6 +9,24 @@ const ToDoGen = () => {
 	const [value, setValue] = useState('') //clears text field on submit
 	const [vis, setVis] = useState({id: null}) //visibility check for delete button
 
+	useEffect(() => {
+		fetch('https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1')
+		.then(list => list.json())
+		.then(data => setItemList(data))
+	}, []);
+
+	useEffect(() => {
+		fetch('https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1', {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json"
+			},
+		body: JSON.stringify(itemList)
+		})
+		.then(res => res.json())
+		.then(data => console.log(data))
+		.then(() => console.log("api put"))
+	}, [itemList])
 
 	const removeItem = (entryId) => {
 		let newList = itemList.map(a => ({...a})) //make shallow copy of the list of entried
@@ -46,7 +64,7 @@ const ToDoGen = () => {
 					onChange={(event) => valueChange(event)} //continuously passes entry to a separate placeholder state
 					onKeyUp={(event) => {
 						if (event.key === "Enter" && event.target.value !== "") { // checks that the user has actually entered something
-							setItemList([...itemList, { id: key++, listItem: event.target.value }]); //id is used as a key in the list item as well
+							setItemList([...itemList, { label: event.target.value, done: false, id: key++}]); //id is used as a key in the list item as well
 							setValue('') //reset entry field to blank
 						}
 					}}
@@ -57,15 +75,16 @@ const ToDoGen = () => {
 					onMouseOver={() => setVis({id:(entry.id)})} //passes the entry id to the visibility check state
 					onMouseLeave={() => setVis({id:null})} //reset visibility check state
 					> 
-					<b>{entry.listItem}</b>
+					<b>{entry.label}</b>
 					{entry.id === vis.id && ( //button will only exist when the visibility state & list entry id match
-					<span type="button" style={{color: "red"}} onClick={() => {removeItem(entry.id)}}>delete</span>)}
+					<span type="button" style={{color: "#E22626"}} onClick={() => {removeItem(entry.id)}}>delete</span>)}
 					</li>)}
 				{taskCounter()}
 				<li className="list-group-item w-100 text-center">
-					<b type="button" style={{color: "red"}}
+					<b type="button" style={{color: "#E22626"}} //delete all tasks button
 					onClick={() => {
-						if (confirm("delete all tasks - are you sure?")) {setItemList([])}
+						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {setItemList([])}	
+						else {alert("no tasks to delete!")}						
 					}}>
 						delete all tasks</b>
 				</li>
@@ -74,5 +93,7 @@ const ToDoGen = () => {
 		</div>
 	);
 };
+
+
 
 export default ToDoGen;

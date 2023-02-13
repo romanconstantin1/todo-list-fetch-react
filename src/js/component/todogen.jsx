@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 let key = 0
 
 const ToDoGen = () => {
-	const defaultVal = [{key: -1, label: "sample item", done: false}]
-	
+	const defaultVal = [{key: -1, label: "sample item - delete me", done: false}]
+
 	const [itemList, setItemList] = useState([defaultVal]) //holds values for list entries
 	const [value, setValue] = useState('') //clears text field on submit
 	const [vis, setVis] = useState({id: null}) //visibility check for delete button
@@ -68,7 +68,7 @@ const ToDoGen = () => {
 		if (itemList.length > 1) {tasksLeft = itemList.length; mult = "s"; yay = ""}
 
 		return <li className="list-group-item w-100">
-			<small>{tasksLeft} task{mult} left {yay}</small>
+			<small><strong>{tasksLeft}</strong> task{mult} left <strong>{yay}</strong></small>
 		</li>
 	}
 
@@ -92,22 +92,23 @@ const ToDoGen = () => {
 				/>
 				{itemList.map(entry => 
 					<li key={entry.id} 
-					className="list-group-item d-flex w-100 align-middle justify-content-between"
+					className="list-group-item d-flex w-100 justify-content-between"
 					onMouseOver={() => setVis({id:(entry.id)})} //passes the entry id to the visibility check state
 					onMouseLeave={() => setVis({id:null})} //reset visibility check state
 					> 
-					<b>{entry.label}</b>
+					<strong>{entry.label}</strong>
 					{entry.id === vis.id && ( //button will only exist when the visibility state & list entry id match
-					<span type="button" style={{color: "#E22626"}} onClick={() => {removeItem(entry.id)}}>delete</span>)}
+					<span type="button" style={{color: "#E22626"}} 
+					onClick={() => {removeItem(entry.id)}}><strong>delete</strong></span>)}
 					</li>)}
 				{taskCounter()}
 				<li className="list-group-item w-100 text-center">
-					<b type="button" style={{color: "#E22626"}} //delete all tasks button
+					<button className="bg-transparent border-0" style={{color: "#E22626"}} //delete all tasks button
 					onClick={() => {
 						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {clearList()}	
-						else {alert("no tasks to delete!")}						
-					}}>
-						delete all tasks</b>
+						else {alert("no tasks to delete!")}}}>
+						<strong>delete all tasks</strong>
+					</button>
 				</li>
 			</ul>
 			</div>

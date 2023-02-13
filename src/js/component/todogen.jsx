@@ -8,25 +8,21 @@ const ToDoGen = () => {
 	const [itemList, setItemList] = useState([]) //holds values for list entries
 	const [value, setValue] = useState('') //clears text field on submit
 	const [vis, setVis] = useState({id: null}) //visibility check for delete button
+	const apiURL = 'https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1'
 
-	useEffect(() => {
-		fetch('https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1')
+	useEffect(() => { //initialize new list if no list exists
+		fetch(apiURL, {
+		method: "POST",
+		headers: {"Content-Type": "application/json"},
+		body: "[]"
+		})
+	}, []);
+
+	useEffect(() => { //update itemList state w/ backend data
+		fetch(apiURL)
 		.then(list => list.json())
 		.then(data => setItemList(data))
 	}, []);
-
-	useEffect(() => {
-		fetch('https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1', {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json"
-			},
-		body: JSON.stringify(itemList)
-		})
-		.then(res => res.json())
-		.then(data => console.log(data))
-		.then(() => console.log("api put"))
-	}, [itemList])
 
 	const removeItem = (entryId) => {
 		let newList = itemList.map(a => ({...a})) //make shallow copy of the list of entried
@@ -36,6 +32,28 @@ const ToDoGen = () => {
 	
 	const valueChange = (event) => {
 		setValue(event.target.value)
+	}
+
+	useEffect(() => { //update backend on new item list
+		fetch(apiURL, {
+		method: "PUT",
+		headers: {"Content-Type": "application/json"},
+		body: JSON.stringify(itemList)
+		})
+		.then(res => res.json())
+		.then(data => console.log(data))
+	}, [itemList])
+	
+	const clearList = () => { //reinitialize list w/ delete all tasks button
+		fetch(apiURL, {
+			headers: {"Content-Type": "application/json"},
+			method: "DELETE"
+		})
+		fetch(apiURL, {
+			headers: {"Content-Type": "application/json"},
+			method: "POST",
+			body: "[]"
+		})
 	}
 
 	const taskCounter = () => {
@@ -83,7 +101,7 @@ const ToDoGen = () => {
 				<li className="list-group-item w-100 text-center">
 					<b type="button" style={{color: "#E22626"}} //delete all tasks button
 					onClick={() => {
-						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {setItemList([])}	
+						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {setItemList([]), clearList()}	
 						else {alert("no tasks to delete!")}						
 					}}>
 						delete all tasks</b>

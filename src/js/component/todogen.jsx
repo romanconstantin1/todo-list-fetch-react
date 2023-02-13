@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { render } from "react-dom/cjs/react-dom.production.min";
-
 let key = 0
 
 const ToDoGen = () => {
-
-	const [itemList, setItemList] = useState([]) //holds values for list entries
+	const defaultVal = [{key: -1, label: "sample item", done: false}]
+	
+	const [itemList, setItemList] = useState([defaultVal]) //holds values for list entries
 	const [value, setValue] = useState('') //clears text field on submit
 	const [vis, setVis] = useState({id: null}) //visibility check for delete button
 	const apiURL = 'https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1'
@@ -21,7 +20,7 @@ const ToDoGen = () => {
 	useEffect(() => { //update itemList state w/ backend data
 		fetch(apiURL)
 		.then(list => list.json())
-		.then(data => setItemList(data))
+		.then(data => {if (data === null) setItemList([defaultVal]); else {setItemList(data)}})
 	}, []);
 
 	const removeItem = (entryId) => {
@@ -35,10 +34,13 @@ const ToDoGen = () => {
 	}
 
 	useEffect(() => { //update backend on new item list
+		let updater;
+		if (itemList.length == 0) {updater = defaultVal
+		} else {updater = itemList}
 		fetch(apiURL, {
 		method: "PUT",
 		headers: {"Content-Type": "application/json"},
-		body: JSON.stringify(itemList)
+		body: JSON.stringify(updater)
 		})
 		.then(res => res.json())
 		.then(data => console.log(data))
@@ -49,18 +51,19 @@ const ToDoGen = () => {
 			headers: {"Content-Type": "application/json"},
 			method: "DELETE"
 		})
-		fetch(apiURL, {
+		.then(() => fetch(apiURL, {
 			headers: {"Content-Type": "application/json"},
 			method: "POST",
 			body: "[]"
-		})
+		}))
+		.then(() => {alert("successfully cleared list!")})
+		.then(() => setItemList([]))
 	}
 
 	const taskCounter = () => {
 		let mult = "s"
 		let tasksLeft = "no"
 		let yay = "- hooray!"
-
 		if (itemList.length == 1) {tasksLeft = 1; mult = ""; yay = ""}
 		if (itemList.length > 1) {tasksLeft = itemList.length; mult = "s"; yay = ""}
 
@@ -101,7 +104,7 @@ const ToDoGen = () => {
 				<li className="list-group-item w-100 text-center">
 					<b type="button" style={{color: "#E22626"}} //delete all tasks button
 					onClick={() => {
-						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {setItemList([]), clearList()}	
+						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {clearList()}	
 						else {alert("no tasks to delete!")}						
 					}}>
 						delete all tasks</b>

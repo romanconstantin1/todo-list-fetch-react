@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-let key = 0
 
 const ToDoGen = () => {
-	const defaultVal = [{key: -1, label: "sample item - delete me", done: false}]
+	const defaultVal = [{id: 0, label: "sample item - delete me", done: false}]
 
 	const [itemList, setItemList] = useState([defaultVal]) //holds values for list entries
 	const [value, setValue] = useState('') //clears text field on submit
@@ -20,11 +19,15 @@ const ToDoGen = () => {
 	useEffect(() => { //update itemList state w/ backend data
 		fetch(apiURL)
 		.then(list => list.json())
-		.then(data => {if (data === null) setItemList([defaultVal]); else {setItemList(data)}})
+		.then(data => {if (data === null) setItemList(defaultVal); else {
+			const newList = data.map((a, index) => {
+				console.log(a, index)
+				return {...a, id: index}})
+			setItemList(newList)}})
 	}, []);
 
 	const removeItem = (entryId) => {
-		let newList = itemList.map(a => ({...a})) //make shallow copy of the list of entried
+		let newList = itemList.map(a => ({...a})) //make shallow copy of the list of entries
 		newList.splice((newList.findIndex(x => x.id === entryId)), 1) //remove entry according to id
 		setItemList(newList)
 	}
@@ -85,7 +88,7 @@ const ToDoGen = () => {
 					onChange={(event) => valueChange(event)} //continuously passes entry to a separate placeholder state
 					onKeyUp={(event) => {
 						if (event.key === "Enter" && event.target.value !== "") { // checks that the user has actually entered something
-							setItemList([...itemList, { label: event.target.value, done: false, id: key++}]); //id is used as a key in the list item as well
+							setItemList([...itemList, {id: itemList.length, label: event.target.value, done: false}]); //id is used as a key in the list item as well
 							setValue('') //reset entry field to blank
 						}
 					}}

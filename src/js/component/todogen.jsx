@@ -77,7 +77,7 @@ const ToDoGen = () => {
 		<div className="row justify-content-center">
 			<div className="col-4">
 			<h1 className="mt-5 text-center">minimalist to-do list</h1>
-			<ul className="shadow d-flex list-group mt-3">
+			<ul className="shadow d-flex list-group align-text-cente mt-3">
 				<input 
 					type="text"
 					value={value} 
@@ -86,7 +86,7 @@ const ToDoGen = () => {
 					onChange={(event) => valueChange(event)} //continuously passes entry to a separate placeholder state
 					onKeyUp={(event) => {
 						if (event.key === "Enter" && event.target.value !== "") { // checks that the user has actually entered something
-							setItemList([...itemList, {id: itemList.length, label: event.target.value, done: false}]); //id is used as a key in the list item as well
+							setItemList([...itemList, {id: itemList.length+1, label: event.target.value, done: false}]); //id is used as a key in the list item as well
 							setValue('') //reset entry field to blank
 						}
 					}}
@@ -97,10 +97,10 @@ const ToDoGen = () => {
 					onMouseOver={() => setVis({id:(entry.id)})} //passes the entry id to the visibility check state
 					onMouseLeave={() => setVis({id:null})} //reset visibility check state
 					> 
-					<strong>{entry.label}</strong>
+					<strong><h5>{entry.label}</h5></strong>
 					{entry.id === vis.id && ( //button will only exist when the visibility state & list entry id match
-					<span type="button" style={{color: "#E22626"}} 
-					onClick={() => {removeItem(entry.id)}}><strong>delete</strong></span>)}
+					<button type="button" class="bg-transparent border-0" key={entry.id} style={{color: "#E22626"}} 
+					onClick={() => {removeItem(entry.id)}}><strong>delete</strong></button>)}
 					</li>)}
 				{taskCounter()}
 				<li className="list-group-item w-100 text-center">

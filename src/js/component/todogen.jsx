@@ -21,15 +21,15 @@ const ToDoGen = () => {
 		.then(list => list.json())
 		.then(data => {if (data === null) setItemList(defaultVal); else {
 			const newList = data.map((a, index) => {
-				console.log(a, index)
 				return {...a, id: index}})
 			setItemList(newList)}})
 	}, []);
 
 	const removeItem = (entryId) => {
-		let newList = itemList.map(a => ({...a})) //make shallow copy of the list of entries
+		const newList = itemList.map(a => ({...a})) //make shallow copy of the list of entries
 		newList.splice((newList.findIndex(x => x.id === entryId)), 1) //remove entry according to id
-		setItemList(newList)
+		const resetList = newList.map((a, index) => {return {...a, id: index}}) //resets entry id on individual item delete
+		setItemList(resetList)
 	}
 	
 	const valueChange = (event) => {
@@ -39,15 +39,13 @@ const ToDoGen = () => {
 	useEffect(() => { //update backend on new item list
 		let updater;
 		if (itemList.length == 0) {updater = defaultVal
-		} else {updater = itemList}
-		fetch(apiURL, {
-		method: "PUT",
-		headers: {"Content-Type": "application/json"},
-		body: JSON.stringify(updater)
-		})
-		.then(res => res.json())
-		.then(data => console.log(data))
-	}, [itemList])
+		} else {updater = itemList} (
+			fetch(apiURL, {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(updater)
+			})
+	)}, [itemList])
 	
 	const clearList = () => { //reinitialize list w/ delete all tasks button
 		fetch(apiURL, {

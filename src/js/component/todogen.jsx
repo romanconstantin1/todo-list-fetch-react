@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 
 const ToDoGen = () => {
-	const defaultVal = [{id: 0, label: "sample item - delete me", done: false}]
+	const defaultVal = [{label: "sample task - delete me", done: false, id: 0}]
 
 	const [itemList, setItemList] = useState([defaultVal]) //holds values for list entries
 	const [value, setValue] = useState('') //clears text field on submit
 	const [vis, setVis] = useState({id: null}) //visibility check for delete button
+	
 	const apiURL = 'https://assets.breatheco.de/apis/fake/todos/user/romanconstantin1'
+	const fetchAPI = (props) => {
+		fetch(apiURL, {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(props)
+			})
+	}
 
 	useEffect(() => { //initialize new list if no list exists
 		fetch(apiURL, {
@@ -25,29 +33,30 @@ const ToDoGen = () => {
 			setItemList(newList)}})
 	}, []);
 
-	const removeItem = (entryId) => {
+	const addEntry = (newEntry) => {
+		const newList = [...itemList, {id: itemList.length, label: newEntry, done: false}]
+		setItemList(newList)
+		fetchAPI(newList)
+	}
+
+	const removeEntry = (entryId) => {
 		const newList = itemList.map(a => ({...a})) //make shallow copy of the list of entries
 		newList.splice((newList.findIndex(x => x.id === entryId)), 1) //remove entry according to id
 		const resetList = newList.map((a, index) => {return {...a, id: index}}) //resets entry id on individual item delete
 		setItemList(resetList)
+		if (resetList.length == 0) {
+			fetchAPI(defaultVal)
+		} else {
+		fetchAPI(resetList)
+		}
 	}
 	
-	const valueChange = (event) => {
+	const valueChange = (event) => { //controlled input
 		setValue(event.target.value)
 	}
-
-	useEffect(() => { //update backend on new item list
-		let updater;
-		if (itemList.length == 0) {updater = defaultVal
-		} else {updater = itemList} (
-			fetch(apiURL, {
-			method: "PUT",
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(updater)
-			})
-	)}, [itemList])
 	
 	const clearList = () => { //reinitialize list w/ delete all tasks button
+		setItemList([])
 		fetch(apiURL, {
 			headers: {"Content-Type": "application/json"},
 			method: "DELETE"
@@ -58,7 +67,8 @@ const ToDoGen = () => {
 			body: "[]"
 		}))
 		.then(() => {alert("successfully cleared list!")})
-		.then(() => setItemList([]))
+		.then(() => fetchAPI(defaultVal))
+		// 3 fetch calls in a row is a lot, right?
 	}
 
 	const taskCounter = () => {
@@ -68,7 +78,7 @@ const ToDoGen = () => {
 		if (itemList.length == 1) {tasksLeft = 1; mult = ""; yay = ""}
 		if (itemList.length > 1) {tasksLeft = itemList.length; mult = "s"; yay = ""}
 
-		return <li className="list-group-item w-100">
+		return <li key="counter" className="list-group-item w-100">
 			<small><strong>{tasksLeft}</strong> task{mult} left <strong>{yay}</strong></small>
 		</li>
 	}
@@ -86,7 +96,7 @@ const ToDoGen = () => {
 					onChange={(event) => valueChange(event)} //continuously passes entry to a separate placeholder state
 					onKeyUp={(event) => {
 						if (event.key === "Enter" && event.target.value !== "") { // checks that the user has actually entered something
-							setItemList([...itemList, {id: itemList.length+1, label: event.target.value, done: false}]); //id is used as a key in the list item as well
+							addEntry(event.target.value)
 							setValue('') //reset entry field to blank
 						}
 					}}
@@ -99,12 +109,12 @@ const ToDoGen = () => {
 					> 
 					<strong><h5>{entry.label}</h5></strong>
 					{entry.id === vis.id && ( //button will only exist when the visibility state & list entry id match
-					<button type="button" class="bg-transparent border-0" key={entry.id} style={{color: "#E22626"}} 
-					onClick={() => {removeItem(entry.id)}}><strong>delete</strong></button>)}
+					<button key={entry.id} type="button" className="bg-transparent border-0"  style={{color: "#E22626"}} 
+					onClick={() => {removeEntry(entry.id)}}><strong>delete</strong></button>)}
 					</li>)}
 				{taskCounter()}
-				<li className="list-group-item w-100 text-center">
-					<button className="bg-transparent border-0" style={{color: "#E22626"}} //delete all tasks button
+				<li key="delete all" className="list-group-item w-100 text-center">
+					<button key="delete all button" className="bg-transparent border-0" style={{color: "#E22626"}} //delete all tasks button
 					onClick={() => {
 						if (itemList.length != 0 && confirm("delete all tasks - are you sure?")) {clearList()}	
 						else {alert("no tasks to delete!")}}}>
